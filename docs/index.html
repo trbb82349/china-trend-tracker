@@ -1,0 +1,3547 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>중국 → 한국 트렌드 트래커</title>
+  <style>
+    :root {
+      --bg: #f7f5ef;
+      --ink: #222426;
+      --muted: #687078;
+      --line: #d8d2c4;
+      --panel: #ffffff;
+      --accent: #c9624f;
+      --accent2: #4d83c7;
+      --green: #1a7f4b;
+      --shadow: 0 4px 24px rgba(34,36,38,0.10);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--ink);
+      font-family: "Pretendard","Apple SD Gothic Neo","Segoe UI",Arial,sans-serif;
+      line-height: 1.6;
+      font-size: 15px;
+    }
+    a { color: var(--accent2); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    /* ── Header ── */
+    .site-header {
+      background: var(--ink);
+      color: #fff;
+      padding: 40px 24px 32px;
+    }
+    .header-inner { max-width: 1200px; margin: 0 auto; }
+    .header-tag {
+      display: inline-block;
+      background: rgba(255,255,255,0.15);
+      border-radius: 4px;
+      padding: 3px 10px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      margin-bottom: 14px;
+    }
+    .site-header h1 { font-size: clamp(24px,4vw,40px); font-weight: 800; line-height: 1.15; margin-bottom: 8px; }
+    .header-sub { color: #b0b8c1; font-size: 14px; margin-bottom: 20px; }
+    .header-stats {
+      display: flex; flex-wrap: wrap; gap: 16px;
+    }
+    .stat-pill {
+      background: rgba(255,255,255,0.10);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 13px;
+    }
+    .stat-pill strong { color: #fff; }
+
+    /* ── Main ── */
+    main { max-width: 1200px; margin: 0 auto; padding: 32px 20px 80px; }
+
+    /* ── Update bar ── */
+    .update-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      background: var(--panel);
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin-bottom: 28px;
+      box-shadow: var(--shadow);
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .update-bar .schedule {
+      display: flex; align-items: center; gap: 8px;
+    }
+    .schedule-dot {
+      width: 8px; height: 8px; background: #34c759; border-radius: 50%;
+      box-shadow: 0 0 0 3px rgba(52,199,89,0.25);
+    }
+
+    /* ── Filters ── */
+    .filters {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 24px;
+    }
+    .filter-btn {
+      background: var(--panel);
+      border: 1.5px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.15s;
+      color: var(--muted);
+    }
+    .filter-btn:hover { border-color: var(--ink); color: var(--ink); }
+    .filter-btn.active {
+      background: var(--ink); border-color: var(--ink); color: #fff;
+    }
+    .sort-select {
+      margin-left: auto;
+      background: var(--panel);
+      border: 1.5px solid var(--line);
+      border-radius: 8px;
+      padding: 6px 12px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+
+    /* ── Cards grid ── */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--panel);
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.18s, box-shadow 0.18s;
+    }
+    .card:hover { transform: translateY(-4px); box-shadow: 0 8px 32px rgba(34,36,38,0.15); }
+    .card.hidden { display: none; }
+
+    .card-top { position: relative; }
+    .card-img {
+      width: 100%; height: 200px;
+      object-fit: cover; display: block;
+    }
+    .card-img-placeholder {
+      width: 100%; height: 200px;
+      background: linear-gradient(135deg,#f0ebe3,#e4ddd4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 56px;
+    }
+
+    .card-body { padding: 20px; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+
+    .card-header-row { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .card-name { font-size: 17px; font-weight: 700; line-height: 1.3; }
+    .card-cn { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .stage-badge {
+      font-size: 11px; font-weight: 700;
+      padding: 4px 10px; border-radius: 999px;
+      white-space: nowrap; flex-shrink: 0;
+    }
+
+    .prob-section { display: flex; flex-direction: column; gap: 5px; }
+    .prob-row { display: flex; align-items: center; gap: 8px; }
+    .prob-label { font-size: 12px; color: var(--muted); }
+    .stars { color: #f4b942; font-size: 13px; letter-spacing: 1px; }
+    .prob-pct { font-size: 14px; font-weight: 700; margin-left: auto; }
+    .prob-track { height: 5px; background: #ede9e2; border-radius: 999px; }
+    .prob-fill { height: 5px; border-radius: 999px; transition: width 0.4s; }
+
+    .info-rows { display: flex; flex-direction: column; gap: 4px; }
+    .info-row { display: grid; grid-template-columns: 80px 1fr; font-size: 13px; }
+    .info-key { color: var(--muted); }
+
+    .why-box, .evidence-box {
+      background: #faf8f4;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    .why-label, .evidence-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 0.05em;
+      color: var(--muted); margin-bottom: 5px;
+    }
+    .evidence-box { background: #f0f4ff; }
+    .evidence-text { color: #444; font-size: 12.5px; }
+
+    .tags-row { display: flex; flex-wrap: wrap; gap: 5px; }
+    .tag {
+      font-size: 11px; padding: 3px 9px;
+      background: #ede9e2; border-radius: 999px; color: var(--muted);
+    }
+
+    .src-links { display: flex; flex-wrap: wrap; gap: 7px; }
+    .src-link {
+      display: inline-flex; align-items: center;
+      font-size: 12px; font-weight: 600;
+      padding: 5px 12px; border-radius: 8px;
+      border: 1.5px solid var(--line);
+      color: var(--ink); background: var(--bg);
+      transition: background 0.15s;
+    }
+    .src-link:hover { background: #eee; text-decoration: none; }
+    .src-link.ali    { border-color: #ff6000; color: #ff6000; }
+    .src-link.taobao { border-color: #ff4400; color: #ff4400; }
+    .src-link.naver  { border-color: #03c75a; color: #1a7f4b; }
+    .src-link.s1688  { border-color: #e3262e; color: #e3262e; }
+
+    .added-date { font-size: 11px; color: #bbb; margin-top: auto; padding-top: 4px; }
+
+    /* ── No results ── */
+    .no-results {
+      grid-column: 1/-1;
+      text-align: center;
+      padding: 60px 20px;
+      color: var(--muted);
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      border-top: 1px solid var(--line);
+      padding: 28px 20px;
+    }
+
+    /* ── 지표 설명 버튼 ── */
+    .criteria-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--ink);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .criteria-btn:hover { opacity: 0.82; }
+
+    /* ── 모달 오버레이 ── */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(22,24,26,0.55);
+      backdrop-filter: blur(3px);
+      z-index: 1000;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 40px 16px 40px;
+      overflow-y: auto;
+    }
+    .modal-backdrop.open { display: flex; }
+
+    .modal {
+      background: var(--panel);
+      border-radius: 18px;
+      width: 100%;
+      max-width: 680px;
+      box-shadow: 0 24px 64px rgba(22,24,26,0.28);
+      overflow: hidden;
+      animation: slideUp 0.22s ease;
+    }
+    @keyframes slideUp {
+      from { transform: translateY(24px); opacity: 0; }
+      to   { transform: translateY(0);    opacity: 1; }
+    }
+
+    .modal-header {
+      background: var(--ink);
+      color: #fff;
+      padding: 22px 28px 18px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+    .modal-header h2 { font-size: 18px; font-weight: 800; line-height: 1.25; }
+    .modal-header p  { color: #b0b8c1; font-size: 13px; margin-top: 5px; }
+    .modal-close {
+      background: rgba(255,255,255,0.14);
+      border: none;
+      color: #fff;
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      font-size: 18px;
+      cursor: pointer;
+      flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.15s;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.25); }
+
+    .modal-body { padding: 24px 28px 32px; display: flex; flex-direction: column; gap: 20px; }
+
+    /* 가중치 요약 바 */
+    .weight-summary {
+      background: #faf8f4;
+      border-radius: 12px;
+      padding: 16px 20px;
+    }
+    .weight-summary h3 { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 12px; letter-spacing: 0.04em; }
+    .weight-bars { display: flex; flex-direction: column; gap: 7px; }
+    .wb-row { display: grid; grid-template-columns: 160px 1fr 36px; align-items: center; gap: 10px; font-size: 12.5px; }
+    .wb-label { color: var(--ink); font-weight: 500; }
+    .wb-track { height: 8px; background: #e8e3da; border-radius: 999px; overflow: hidden; }
+    .wb-fill  { height: 8px; border-radius: 999px; }
+    .wb-pct   { font-size: 12px; font-weight: 700; text-align: right; }
+
+    /* 지표 카드 */
+    .indicator-list { display: flex; flex-direction: column; gap: 12px; }
+    .ind-card {
+      border: 1.5px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .ind-head {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 16px;
+      cursor: pointer;
+      user-select: none;
+      background: #fafaf8;
+      transition: background 0.12s;
+    }
+    .ind-head:hover { background: #f3f0e8; }
+    .ind-num {
+      width: 26px; height: 26px;
+      background: var(--ink);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 11px;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .ind-title { flex: 1; }
+    .ind-name  { font-size: 14px; font-weight: 700; }
+    .ind-meta  { font-size: 11.5px; color: var(--muted); margin-top: 1px; }
+    .ind-badge {
+      font-size: 12px; font-weight: 700;
+      padding: 3px 10px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .ind-chevron { font-size: 12px; color: var(--muted); transition: transform 0.18s; }
+    .ind-card.open .ind-chevron { transform: rotate(180deg); }
+
+    .ind-body {
+      display: none;
+      padding: 0 16px 16px;
+      font-size: 13px;
+      line-height: 1.65;
+    }
+    .ind-card.open .ind-body { display: block; }
+
+    .ind-why {
+      background: #f0f4ff;
+      border-radius: 8px;
+      padding: 10px 13px;
+      margin-bottom: 10px;
+      font-size: 12.5px;
+      color: #2a4a7a;
+      border-left: 3px solid #4d83c7;
+    }
+    .score-table { width: 100%; border-collapse: collapse; font-size: 12.5px; margin-top: 6px; }
+    .score-table th { background: #f0ece4; padding: 6px 10px; text-align: left; font-weight: 600; color: var(--muted); font-size: 11px; }
+    .score-table td { padding: 6px 10px; border-bottom: 1px solid #f0ece4; }
+    .score-table tr:last-child td { border-bottom: none; }
+    .s-pts { font-weight: 700; color: var(--accent); }
+
+    /* 점수→확률 */
+    .prob-map {
+      background: #faf8f4;
+      border-radius: 12px;
+      padding: 16px 20px;
+    }
+    .prob-map h3 { font-size: 13px; font-weight: 700; color: var(--muted); margin-bottom: 10px; }
+    .prob-map-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+    .pm-item {
+      display: flex; align-items: center; gap: 8px;
+      background: var(--panel); border-radius: 8px; padding: 8px 12px;
+      font-size: 12.5px;
+    }
+    .pm-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+    /* 타이밍 보정 */
+    .timing-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .tm-item {
+      display: flex; align-items: center; gap: 8px;
+      background: #faf8f4; border-radius: 8px; padding: 8px 12px; font-size: 12.5px;
+    }
+    .tm-badge {
+      font-size: 11px; font-weight: 700; padding: 2px 7px;
+      border-radius: 4px; white-space: nowrap;
+    }
+    .tm-neg { background: #fff1ee; color: #c9624f; }
+    .tm-pos { background: #eef8f0; color: #1a7f4b; }
+
+    @media (max-width: 600px) {
+      .cards-grid { grid-template-columns: 1fr; }
+      .modal-body { padding: 20px 18px 28px; }
+      .wb-row { grid-template-columns: 120px 1fr 36px; }
+      .prob-map-grid, .timing-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="site-header">
+  <div class="header-inner">
+    <div class="header-tag">TREND TRACKER · 자동 업데이트</div>
+    <h1>중국 → 한국<br>트렌드 제품 트래커</h1>
+    <p class="header-sub">중국에서 먼저 유행하고 한국에 상륙 예정인 제품을 추적합니다. 매주 월·목 자동 업데이트.</p>
+    <div class="header-stats">
+      <div class="stat-pill">추적 제품 <strong>55개</strong></div>
+      <div class="stat-pill">유행 가능성 80%↑ <strong>16개</strong></div>
+      <div class="stat-pill">평균 가능성 <strong>75%</strong></div>
+    </div>
+  </div>
+</div>
+
+<main>
+  <div class="update-bar">
+    <div class="schedule">
+      <div class="schedule-dot"></div>
+      <span>자동 업데이트: 매주 <strong>월요일 · 목요일</strong> 오전 9시 (KST)</span>
+    </div>
+    <span>마지막 업데이트: <strong>2026년 07월 03일 02:57</strong></span>
+  </div>
+
+  <div class="filters">
+    <button class="filter-btn active" data-stage="all">전체</button>
+<button class="filter-btn" data-stage="viral">대유행</button>
+<button class="filter-btn" data-stage="peak">피크</button>
+<button class="filter-btn" data-stage="hot">유행</button>
+<button class="filter-btn" data-stage="season">시즌 피크</button>
+<button class="filter-btn" data-stage="rising">상승 중</button>
+<button class="filter-btn" data-stage="early">초기 신호</button>
+
+    <button class="criteria-btn" id="open-criteria">📊 지표 설명</button>
+    <select class="sort-select" id="sort-select">
+      <option value="default">정렬: 유행 단계순</option>
+      <option value="prob-desc">유행 가능성 높은 순</option>
+      <option value="prob-asc">유행 가능성 낮은 순</option>
+      <option value="newest">최신 등록순</option>
+    </select>
+  </div>
+
+  <div class="cards-grid" id="cards-grid">
+    
+    <div class="card" data-stage="viral" data-prob="95">
+      <div class="card-top">
+        <img class="card-img"
+          src="https://search.pstatic.net/common/?type=b150&src=http%3A%2F%2Fimgnews.naver.net%2Fimage%2F5308%2F2024%2F04%2F19%2F0000086045_001_20240419091001699.jpg"
+          alt="라부부 피규어 키링"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="card-img-placeholder" style="display:none">🐰</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">라부부 피규어 키링</div>
+            <div class="card-cn">拉布布挂件</div>
+          </div>
+          <div class="stage-badge" style="background:#fff1ee;color:#e25f48">🔥 대유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★★</span>
+            <span class="prob-pct" style="color:#e25f48">95%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:95%;background:#e25f48"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>감성 소품 · 피규어</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 선행</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2024년 초 ~ 현재</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>2~6만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-10점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">팝마트(Pop Mart) 베이징 기업의 블라인드박스 IP. 뾰족한 귀·긴 이빨의 '못생긴 귀여운' 디자인이 수집 욕구 자극. 한국 리셀가 최대 30배. 셀럽 가방 착용으로 추가 바이럴.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">2024년 태국 경유 한국 상륙 후 전국 팝업 오픈런. 네이버 쇼핑 검색량 수천% 급등. 리셀 플랫폼 크림·번개장터 거래량 TOP3.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">피규어</span><span class="tag">블라인드박스</span><span class="tag">키링</span><span class="tag">수집</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=labubu+keyring+pop+mart" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=拉布布+挂件" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=라부부+키링" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=拉布布+挂件+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="viral" data-prob="90">
+      <div class="card-top">
+        <div class="card-img-placeholder">📿</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">비즈 팔찌 DIY 세트</div>
+            <div class="card-cn">串珠手链DIY套装</div>
+          </div>
+          <div class="stage-badge" style="background:#fff1ee;color:#e25f48">🔥 대유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#e25f48">90%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:90%;background:#e25f48"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>패션 · 액세서리</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>글로벌 동시 (테일러 스위프트 '우정 팔찌' 트리거)</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>5천~2만 원 (키트)</span></div>
+          
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">테일러 스위프트 에라스 투어 '프렌드십 브레이슬릿' 문화 → Z세대 DIY 팔찌 열풍. 알파벳·하트·별 비즈로 이름·문구 커스텀. 단짝끼리 교환하는 문화로 교내 유행.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">에라스 투어 이후 전 세계 비즈 키트 품귀. 한국 다이소 비즈 코너 매출 급증. 틱톡 '#friendshipbracelet' 조회수 수억 회.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">DIY</span><span class="tag">팔찌</span><span class="tag">액세서리</span><span class="tag">우정</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=bead+bracelet+DIY+kit+friendship+alphabet" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=串珠+手链+DIY+套装+字母" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=비즈팔찌+DIY" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=串珠手链DIY+套装+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="viral" data-prob="88">
+      <div class="card-top">
+        <img class="card-img"
+          src="https://search.pstatic.net/common/?type=b150&src=https%3A%2F%2Fshop-phinf.pstatic.net%2F20260602_194%2F1780387172800CbaKu_JPEG%2F114520067927849357_1151816957.jpeg"
+          alt="클리커 / 스퀴시 키캡"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="card-img-placeholder" style="display:none">🟡</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">클리커 / 스퀴시 키캡</div>
+            <div class="card-cn">软萌键帽解压玩具</div>
+          </div>
+          <div class="stage-badge" style="background:#fff1ee;color:#e25f48">🔥 대유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#e25f48">88%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:88%;background:#e25f48"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>감성 소품 · 피젯 토이</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>한국 독자 발화</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>3~8천 원</span></div>
+          
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">키보드 키캡 모양의 말랑한 버튼. 누르면 딸깍 소리 나는 피젯 토이. 치즈·네잎클로버·하트 등 아기자기한 디자인. 손에서 놓기 힘든 중독성으로 Z세대 스트레스 해소 아이템 자리잡음.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">2026년 초 틱톡·인스타 라이브 필수 소품. 네이버 쇼핑 '클리커' 검색량 월 수만 건. 소품샵·문구샵 매출 상위 아이템.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">피젯토이</span><span class="tag">스퀴시</span><span class="tag">키캡</span><span class="tag">스트레스해소</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=squishy+keycap+clicker+fidget" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=软萌+键帽+解压" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=클리커+피젯" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=软萌键帽+解压+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="viral" data-prob="88">
+      <div class="card-top">
+        <div class="card-img-placeholder">🦈</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">대형 집게핀 (클로 클립)</div>
+            <div class="card-cn">大号鲨鱼夹</div>
+          </div>
+          <div class="stage-badge" style="background:#fff1ee;color:#e25f48">🔥 대유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#e25f48">88%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:88%;background:#e25f48"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>패션 · 액세서리</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>글로벌 동시</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2024 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>3천~1만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">대형 클로 클립으로 머리 절반 고정하는 'half-up' 헤어 스타일 유행. 투명·파스텔·마블 패턴 다양. 핀터레스트·틱톡 헤어 콘텐츠에서 빠지지 않는 아이템.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">알리익스프레스 뷰티/헤어 카테고리 연간 베스트셀러 TOP5. 다이소 클로 클립 상시 품절. 한국 뷰티 유튜버 '아이템 추천' 단골 등장.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">헤어핀</span><span class="tag">액세서리</span><span class="tag">헤어스타일</span><span class="tag">클립</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=large+claw+hair+clip+shark+clip" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=大号+鲨鱼夹+抓夹" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=대형집게핀+클로클립" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=大号鲨鱼夹+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="peak" data-prob="95">
+      <div class="card-top">
+        <div class="card-img-placeholder">👡</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">젤리슈즈 (PVC 샌들)</div>
+            <div class="card-cn">果冻鞋PVC凉鞋</div>
+          </div>
+          <div class="stage-badge" style="background:#fff1ee;color:#c9624f">⚡ 피크</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★★</span>
+            <span class="prob-pct" style="color:#e25f48">95%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:95%;background:#e25f48"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>패션 · 신발</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>Y2K 레트로 글로벌</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2026년 4월 ~ 2026년 9월</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>1~3만 원</span></div>
+          
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">핀터레스트 Y2K → 인스타·틱톡 바이럴 → 동대문 신발상가 방문 열풍. 장마철 방수 실용성 + Y2K 레트로 감성 + '신꾸' 커스텀 욕구 결합.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">6.22~7.2 네이버 블로그 10건 이상 집중 게재. '동대문 신발도매상가 젤리슈즈 꾸미기' 방문기 복수. 인스타·틱톡 동시 언급 확인.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">Y2K</span><span class="tag">신발</span><span class="tag">여름</span><span class="tag">방수</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=jelly+shoes+PVC+sandals+Y2K" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=果冻鞋+PVC+凉鞋+Y2K" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=젤리슈즈" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=果冻鞋+PVC凉鞋+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="peak" data-prob="90">
+      <div class="card-top">
+        <div class="card-img-placeholder">🩱</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">시스루 볼레로 가디건</div>
+            <div class="card-cn">透视波蕾诺开衫</div>
+          </div>
+          <div class="stage-badge" style="background:#fff1ee;color:#c9624f">⚡ 피크</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#e25f48">90%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:90%;background:#e25f48"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>패션 · 아우터</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>한국 독자 발화 (셀럽 주도)</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2026년 4월 ~ 2026년 8월</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>2~5만 원</span></div>
+          
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">소유·강유정 등 연예인 인스타 비키니 레이어드 착용 → '살안타템' 키워드로 확산 → 자라·무신사 판매량 증가. 시어(Sheer) 소재 트렌드와 교차.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">7.1~7.2 블로그 8건 이상. '#시스루가디건 #살안타템' 해시태그 급증. 자라 2026 여름 세일 상위권.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">여름패션</span><span class="tag">가디건</span><span class="tag">셀럽</span><span class="tag">레이어드</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=see+through+bolero+cardigan+sheer+summer" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=透视+波蕾诺+开衫+薄款" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=시스루볼레로" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=透视波蕾诺+开衫+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="peak" data-prob="87">
+      <div class="card-top">
+        <div class="card-img-placeholder">👗</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">플리츠 미니 스커트 (Y2K)</div>
+            <div class="card-cn">百褶短裙Y2K</div>
+          </div>
+          <div class="stage-badge" style="background:#fff1ee;color:#c9624f">⚡ 피크</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#e25f48">87%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:87%;background:#e25f48"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>패션 · 하의</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>Y2K 레트로 글로벌</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025년 하반기 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>2~6만 원</span></div>
+          
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">Y2K 감성의 플레어 플리츠 미니 스커트. 체크·스트라이프·솔리드 모두 인기. 언더웨어 레이어드·청자켓 코디가 틱톡 바이럴. 걷고 뛸 때 펄럭이는 실루엣이 영상 친화적.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">무신사·지그재그 여름 스커트 카테고리 1위 경쟁. 틱톡·인스타 '플리츠 코디' 콘텐츠 수천 건. 트위터·더쿠 교복 느낌 레트로 반응.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">Y2K</span><span class="tag">스커트</span><span class="tag">여름패션</span><span class="tag">레트로</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=pleated+mini+skirt+Y2K+school+plaid" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=百褶短裙+Y2K+格子" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=플리츠미니스커트+Y2K" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=百褶短裙+Y2K+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="peak" data-prob="85">
+      <div class="card-top">
+        <div class="card-img-placeholder">🩰</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">메리제인 슈즈</div>
+            <div class="card-cn">玛丽珍鞋</div>
+          </div>
+          <div class="stage-badge" style="background:#fff1ee;color:#c9624f">⚡ 피크</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#e25f48">85%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:85%;background:#e25f48"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>패션 · 신발</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>Y2K 레트로 글로벌</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025년 하반기 ~ 2026년 하반기</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>4~15만 원</span></div>
+          
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">발레리나·교복 감성의 메리제인 플랫. 스트랩 디테일이 Y2K 레트로 코드와 딱 맞음. 치마·양말 레이어드로 틱톡 '올드머니' '청순핫걸' 코디에 필수.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">에이블리·무신사 신발 카테고리 2026년 상반기 1~3위 경쟁. 핀터레스트·인스타 'ballet flat' 조회수 전년비 3배. 중국산 가성비 모델 알리익스프레스 폭발.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">Y2K</span><span class="tag">신발</span><span class="tag">발레코어</span><span class="tag">레트로</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=mary+jane+shoes+ballet+flat+strap" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=玛丽珍鞋+复古+芭蕾" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=메리제인슈즈" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=玛丽珍鞋+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="85">
+      <div class="card-top">
+        <div class="card-img-placeholder">😵</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">두쫀쿠 (얼굴 스퀴시)</div>
+            <div class="card-cn">捏捏脸解压玩具</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#e25f48">85%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:85%;background:#e25f48"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>감성 소품 · 피젯 토이</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 선행</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>3~7천 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-8점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">귀엽고 찌그러지는 얼굴 모양 스퀴시 토이. '두근두근 쫀쫀한 쿠션' 줄임말. 눌렀다 복원되는 과정이 영상으로 퍼지며 바이럴. 캐릭터마다 다른 표정이 수집 욕구 자극.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">샤오홍슈·더우인 '捏捏脸' 콘텐츠 대규모 확산 후 한국 소품샵 입점 급증. 틱톡 ASMR 영상으로 2차 바이럴. 말랑이 다음 주자로 평가.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">피젯토이</span><span class="tag">스퀴시</span><span class="tag">ASMR</span><span class="tag">얼굴</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=face+squishy+squeeze+toy+cute" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=捏捏脸+解压+玩具" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=두쫀쿠+스퀴시" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=捏捏脸+解压玩具+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="82">
+      <div class="card-top">
+        <img class="card-img"
+          src="https://search.pstatic.net/sunny/?type=b150&src=https%3A%2F%2Fdown.humoruniv.com%2Fhwiparambbs%2Fdata%2Feditor%2Ffree%2Fe_sb79fb4001_da4f3f8cb5cbd288c8e0df0c4378411dcd619fbe.jpg"
+          alt="왁뿌볼 (팝볼)"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="card-img-placeholder" style="display:none">💚</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">왁뿌볼 (팝볼)</div>
+            <div class="card-cn">网格解压球</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">82%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:82%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>감성 소품 · 피젯 토이</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>한국 독자 발화</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>2~3천 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">고무망 안에 말랑한 공이 들어있어 쥐면 팡팡 터지는 감각. 청사과·딸기·포도 과일 색상이 귀여움. 다이소 DIY 버전 출시될 만큼 대중화.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">2025년 하반기 초·중학생 사이 급속 확산. 다이소 유사품 출시. 네이버 블로그 '왁뿌볼' 게시물 수천 건.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">피젯토이</span><span class="tag">스트레스볼</span><span class="tag">촉감</span><span class="tag">어린이</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=mesh+stress+ball+pop+fruit" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=网格+解压球+水果" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=왁뿌볼" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=网格解压球+水果+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="82">
+      <div class="card-top">
+        <div class="card-img-placeholder">🖨️</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">포켓 포토 미니 프린터</div>
+            <div class="card-cn">迷你口袋打印机</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">82%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:82%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>IT 소품 · 프린터</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>글로벌 동시</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2024 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>5만~15만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-5점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">폴라로이드 감성으로 즉석 사진 출력. 스마트폰 연동 블루투스. 스티커 인쇄·라벨 출력 모델도 인기. 다이어리 꾸미기·방꾸·여행 굿즈 제작에 필수.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">한국 포켓 프린터 시장 연 30% 성장. 캐논·후지 외에 중국 브랜드 HPRT·Phomemo 급성장. 인스타 '#포켓프린터' 게시물 급증.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">프린터</span><span class="tag">사진</span><span class="tag">다이어리</span><span class="tag">선물</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=pocket+photo+mini+printer+bluetooth+polaroid" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=迷你口袋打印机+蓝牙+拍立得" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=포켓프린터+미니" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=迷你口袋打印机+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="80">
+      <div class="card-top">
+        <img class="card-img"
+          src="https://search.pstatic.net/sunny/?type=b150&src=https%3A%2F%2Fgi.esmplus.com%2Fkuijo7486%2FLivingLoving2601%2F%25EB%25B9%25B5%25EB%25A7%2590%25EB%259E%2591%25EC%259D%25B4%2520%25ED%2582%25A4%25EB%25A7%2581%2F2.jpg"
+          alt="말랑이 (슬로우 라이징 스퀴시)"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="card-img-placeholder" style="display:none">🍞</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">말랑이 (슬로우 라이징 스퀴시)</div>
+            <div class="card-cn">慢回弹捏捏乐</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">80%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:80%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>감성 소품 · 피젯 토이</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>한국 독자 발화</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2024 ~ 2025년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>2~5천 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">음식 모양의 말랑한 폼 장난감. 천천히 복원되는 촉감이 힐링 포인트. 메론빵·만두냥·우유구름빵 버전 인기. 소품샵 필수 아이템 안착.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">2024~2025년 소품샵 베스트셀러 장기 유지. 인스타·틱톡 '말랑이' 언박싱 콘텐츠 다수. 전 연령층 구매.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">스퀴시</span><span class="tag">힐링</span><span class="tag">촉감</span><span class="tag">음식모양</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=slow+rising+squishy+food+toy+bread" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=慢回弹+捏捏+面包+食物" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=말랑이+빵" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=慢回弹+捏捏乐+面包+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="80">
+      <div class="card-top">
+        <div class="card-img-placeholder">🦋</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">Y2K 나비 헤어핀 세트</div>
+            <div class="card-cn">Y2K蝴蝶发夹套装</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">80%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:80%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>패션 · 액세서리</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>Y2K 레트로 글로벌</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>3천~1만 원 (세트)</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">2000년대 나비·꽃·별 모양 미니 헤어핀 재유행. 색상 믹스 여러 개 동시 착용하는 '핀 가득' 스타일. 셀럽 착용으로 인스타 바이럴. 소품샵 필수 입점 아이템.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">핀터레스트 'Y2K hair pins' 조회수 전년비 4배. 인스타 '#나비핀 #헤어핀세트' 게시물 급증. 올리브영 핵인싸 코너 상위 입점.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">Y2K</span><span class="tag">헤어핀</span><span class="tag">액세서리</span><span class="tag">레트로</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=Y2K+butterfly+hair+clips+set+mini" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=Y2K+蝴蝶+发夹+套装" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=나비헤어핀+Y2K+세트" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=蝴蝶发夹+Y2K+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="80">
+      <div class="card-top">
+        <div class="card-img-placeholder">🐾</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">고양이 발 유리컵</div>
+            <div class="card-cn">猫爪玻璃杯</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">80%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:80%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>주방 · 생활</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 선행</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2024 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>1~3만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-5점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">음료를 담으면 고양이 발바닥 모양이 보이는 이중 유리컵. 따뜻한 음료 넣으면 핑크 발바닥, 차가운 음료 넣으면 화이트로 변하는 버전도 있음. 카페·집 SNS 인증샷 필수.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">샤오홍슈 '猫爪杯' 조회수 수억. 알리익스프레스 상시 베스트셀러. 한국 카페 굿즈·기념품으로도 활용. 선물 수요 꾸준.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">주방</span><span class="tag">컵</span><span class="tag">고양이</span><span class="tag">선물</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=cat+paw+glass+cup+double+wall" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=猫爪+玻璃杯+双层" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=고양이발+유리컵" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=猫爪玻璃杯+双层+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="78">
+      <div class="card-top">
+        <div class="card-img-placeholder">👖</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">카고 팬츠 (Y2K 밀리터리)</div>
+            <div class="card-cn">工装裤Y2K风格</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">78%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:78%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>패션 · 하의</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>글로벌 동시</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>3~7만 원</span></div>
+          
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">2000년대 밀리터리 감성 카고 팬츠 재유행. 와이드 핏 + 멀티 포켓. 크롭 탑·그래픽 티와 코디. 더우인 '스트리트 코어' 스타일로 중국에서 먼저 유행 후 한국 상륙.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">무신사 남녀 공용 카고 팬츠 판매 급증. 에이블리·지그재그 2026 상반기 하의 TOP10. 더우인·틱톡 스트리트 패션 콘텐츠 단골 아이템.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">Y2K</span><span class="tag">바지</span><span class="tag">스트리트</span><span class="tag">밀리터리</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=cargo+pants+Y2K+military+wide+leg" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=工装裤+Y2K+宽松" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=카고팬츠+Y2K" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=工装裤+Y2K+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="78">
+      <div class="card-top">
+        <img class="card-img"
+          src="https://search.pstatic.net/common/?type=b150&src=http%3A%2F%2Fshop1.phinf.naver.net%2F20251029_87%2F1761676332166bIVyd_JPEG%2F1216348981902984_1812708987.jpg"
+          alt="포토토 (POTOTO) Y2K 빈티지 디카"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="card-img-placeholder" style="display:none">📷</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">포토토 (POTOTO) Y2K 빈티지 디카</div>
+            <div class="card-cn">复古数码相机Y2K</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">78%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:78%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>IT 소품 · 카메라</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 브랜드 · 한국 독자 발화</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>3~5만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-10점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">중국 브랜드지만 한국에서 Y2K 감성으로 대박. 파스텔 색상 + 필름 느낌 사진. 선물 패키지로 특히 인기.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">2025년 네이버 쇼핑 디카 카테고리 TOP 진입. 인스타 '#포토토' 게시물 수만 건. 선물용 수요로 반복 판매.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">Y2K</span><span class="tag">카메라</span><span class="tag">레트로</span><span class="tag">선물</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=POTOTO+vintage+digital+camera+Y2K" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=POTOTO+复古+数码相机" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=포토토+빈티지+디카" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=复古数码相机+Y2K+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="78">
+      <div class="card-top">
+        <div class="card-img-placeholder">🌸</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">3D 꽃 투명 폰 케이스</div>
+            <div class="card-cn">3D立体花朵透明手机壳</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">78%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:78%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>IT 소품 · 케이스</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 선행</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>5천~2만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">투명 케이스 위에 3D로 꽃·별·나비가 입체적으로 올라온 디자인. 실물 꽃·입체 비즈 삽입 모델도 인기. 여성 MZ세대 폰 꾸미기 1순위.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">샤오홍슈 '花朵手机壳' 조회수 수억 회. 알리익스프레스 케이스 한국 구매 상위. 네이버 쇼핑 '플라워폰케이스' 검색 급증.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">폰케이스</span><span class="tag">3D</span><span class="tag">꽃</span><span class="tag">감성</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=3D+flower+transparent+phone+case+cute" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=3D立体花朵+透明手机壳" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=꽃폰케이스+3D" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=3D花朵手机壳+透明+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="77">
+      <div class="card-top">
+        <div class="card-img-placeholder">🐊</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">크록스 지비츠 참 세트</div>
+            <div class="card-cn">洞洞鞋装饰扣套装</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">77%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:77%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>패션 · 액세서리</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>글로벌 동시</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2024 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>3천~2만 원 (세트)</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-5점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">크록스 구멍에 끼우는 장식 참. 캐릭터·음식·꽃·별 등 수백 종. '신꾸(신발 꾸미기)' 문화와 완벽 결합. 같은 크록스라도 개성 표현 가능. 중국산 호환 제품이 저렴해 알리 인기.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">크록스 한국 판매량 매년 급증. 지비츠 참 알리익스프레스 상시 인기 아이템. 초등학생~성인 전 세대 구매.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">신발</span><span class="tag">액세서리</span><span class="tag">신꾸</span><span class="tag">크록스</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=crocs+jibbitz+charms+set+shoe+decoration" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=洞洞鞋+装饰扣+鞋花+套装" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=크록스지비츠+참" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=洞洞鞋装饰扣+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="77">
+      <div class="card-top">
+        <div class="card-img-placeholder">🍓</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">딸기 모양 텀블러·보온병</div>
+            <div class="card-cn">草莓保温杯</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">77%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:77%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>주방 · 생활</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 선행</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>2~5만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">딸기·토마토·수박 형태의 귀여운 텀블러. 실리콘 외장 + 스테인리스 내통. SNS 인증샷·카페 들고다니기 필수. 감성 텀블러 수요 급증과 맞물림.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">샤오홍슈 '草莓杯' 콘텐츠 수천만 조회. 알리익스프레스 생활용품 상위 지속. 한국 감성 텀블러 시장 급성장.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">텀블러</span><span class="tag">딸기</span><span class="tag">주방</span><span class="tag">선물</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=strawberry+tumbler+cute+bottle+thermos" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=草莓+保温杯+可爱" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=딸기텀블러+귀여운" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=草莓保温杯+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="76">
+      <div class="card-top">
+        <img class="card-img"
+          src="https://search.pstatic.net/common/?type=b150&src=http%3A%2F%2Fshop1.phinf.naver.net%2F20250730_228%2F1753886018239ahtsl_JPEG%2F28390339164649_93111389.jpg"
+          alt="구름 / 버섯 LED 무드등"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="card-img-placeholder" style="display:none">☁️</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">구름 / 버섯 LED 무드등</div>
+            <div class="card-cn">云朵蘑菇小夜灯</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">76%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:76%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>인테리어 · 조명</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 선행</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2024 ~ 현재</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>1~3만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">몽글몽글한 구름 또는 귀여운 버섯 형태의 LED 조명. 색상 변환 가능. SNS 방꾸 필수 소품. 다이소 유사품까지 출시.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">2024년 중반 샤오홍슈 발원 후 한국 인스타 방꾸 콘텐츠로 확산. 다이소 유사품 품절 반복. 알리익스프레스 히트 제품 꾸준히 유지.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">방꾸</span><span class="tag">조명</span><span class="tag">인테리어</span><span class="tag">무드등</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=cloud+mushroom+LED+night+light+mood+lamp" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=云朵+蘑菇+小夜灯+氛围灯" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=구름무드등" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=云朵小夜灯+蘑菇灯+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="76">
+      <div class="card-top">
+        <div class="card-img-placeholder">📿</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">레이어드 목걸이 세트</div>
+            <div class="card-cn">叠戴项链套装</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">76%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:76%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>패션 · 액세서리</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>글로벌 동시</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>5천~2만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">2~3개를 겹쳐 착용하는 레이어드 목걸이. 별·달·하트 참 장식. '올드머니' '청순핫걸' 코디 필수. 얇은 골드·실버 체인이 대세. 중국 가성비 제품 알리로 대거 유입.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">에이블리·지그재그 악세사리 베스트 지속. 인스타 '#레이어드목걸이' 해시태그 수만 건. 로드샵·소품샵 진열대 점령.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">주얼리</span><span class="tag">목걸이</span><span class="tag">레이어드</span><span class="tag">액세서리</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=layered+necklace+set+gold+silver+chain" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=叠戴项链+套装+星星月亮" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=레이어드목걸이+세트" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=叠戴项链套装+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="76">
+      <div class="card-top">
+        <div class="card-img-placeholder">🐱</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">고양이 귀 블루투스 헤드폰</div>
+            <div class="card-cn">猫耳蓝牙耳机</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">76%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:76%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>IT 소품 · 헤드폰</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 선행</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>3~8만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-5점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">고양이 귀 모양 장식이 달린 블루투스 헤드폰. LED 발광 기능. '귀여운 감성 IT 소품' 트렌드 정점 아이템. 여성·청소년 층 압도적 인기. 영상 콘텐츠 촬영 소품으로도 활용.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">샤오홍슈 '猫耳耳机' 조회수 수백만. 알리익스프레스 헤드폰 카테고리 한국 구매자 비중 높음. 한국 틱톡 '공부 브이로그' 필수 소품.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">헤드폰</span><span class="tag">고양이</span><span class="tag">LED</span><span class="tag">감성IT</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=cat+ear+headphones+bluetooth+LED+girl" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=猫耳+蓝牙耳机+发光" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=고양이귀헤드폰" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=猫耳蓝牙耳机+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="76">
+      <div class="card-top">
+        <div class="card-img-placeholder">🖊️</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">마스킹 테이프 (와시 테이프) 세트</div>
+            <div class="card-cn">和纸胶带套装</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">76%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:76%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>문구 · 다이어리</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>일본·중국 발원 → 글로벌</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2024 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>3천~1만 원 (세트)</span></div>
+          
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">꽃·음식·레트로 패턴이 담긴 반투명 마스킹 테이프. 다이어리·노트·소품 꾸미기 필수. '다꾸(다이어리 꾸미기)' 문화의 핵심 소재. 중국산 퀄리티가 높아 알리 구매 활발.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">다꾸 커뮤니티 폭발적 성장. 알리익스프레스 문구 카테고리 한국 구매 1위. 다이소 와시테이프 코너 상시 품절.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">문구</span><span class="tag">다꾸</span><span class="tag">테이프</span><span class="tag">꾸미기</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=washi+tape+set+decorative+masking" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=和纸胶带+套装+手账" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=마스킹테이프+와시테이프" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=和纸胶带套装+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="75">
+      <div class="card-top">
+        <div class="card-img-placeholder">🪣</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">버킷햇 (Y2K 감성)</div>
+            <div class="card-cn">渔夫帽Y2K</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">75%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:75%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>패션 · 모자</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>Y2K 레트로 글로벌</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>1~4만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">2000년대 낚시꾼 모자 재유행. 로고·패턴·솔리드 다양. 데님·체크·코듀로이 소재 특히 인기. 여름 햇빛 차단 실용성 + Y2K 패션 포인트 동시 충족.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">무신사·에이블리 모자 카테고리 상위권 유지. 틱톡·인스타 여름 코디 필수품. 편의점 PB상품까지 출시.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">모자</span><span class="tag">Y2K</span><span class="tag">여름패션</span><span class="tag">레트로</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=bucket+hat+Y2K+denim+unisex" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=渔夫帽+Y2K+水洗牛仔" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=버킷햇+Y2K" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=渔夫帽+Y2K+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="75">
+      <div class="card-top">
+        <div class="card-img-placeholder">🐸</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">3D 동물 에어팟 케이스</div>
+            <div class="card-cn">3D动物立体耳机保护套</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">75%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:75%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>IT 소품 · 케이스</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 선행</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>5천~2만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">개구리·곰·오리·고양이 형태의 입체 에어팟 케이스. 실리콘 소재, 귀여운 디테일. SNS 인증샷 필수 아이템. 배경에 의도치 않게 노출될 만큼 소장 욕구 자극.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">샤오홍슈 에어팟 케이스 언박싱 콘텐츠 폭발적 인기. 알리익스프레스 케이스 한국 주문 급증. 무신사·마켓컬리 입점.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">에어팟케이스</span><span class="tag">3D</span><span class="tag">귀여운</span><span class="tag">감성IT</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=cute+3D+animal+airpods+case+silicone" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=3D动物+耳机保护套+可爱" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=에어팟케이스+동물+3D" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=3D动物耳机套+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="74">
+      <div class="card-top">
+        <img class="card-img"
+          src="https://search.pstatic.net/common/?type=b150&src=http%3A%2F%2Fshop1.phinf.naver.net%2F20260423_179%2F1776928275694OSnFy_JPEG%2F3172073822098843_942911986.jpg"
+          alt="마카롱 유리 테이블 램프"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="card-img-placeholder" style="display:none">🟢</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">마카롱 유리 테이블 램프</div>
+            <div class="card-cn">马卡龙玻璃台灯</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">74%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:74%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>인테리어 · 조명</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 제조 · 글로벌 동시</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>2~4만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">마카롱처럼 두 겹으로 쌓인 둥근 유리 램프. 삼색 조광 가능. 침실·책상 위 인테리어로 인스타 필수 소품. 북유럽 감성과 맞물려 지속 수요.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">핀터레스트·인스타 'desk setup' 콘텐츠 단골 등장. 알리익스프레스 리뷰 수만 건 축적.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">인테리어</span><span class="tag">조명</span><span class="tag">북유럽</span><span class="tag">책상</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=macaron+glass+table+lamp+double+layer+mushroom" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=马卡龙+玻璃台灯+双层" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=마카롱램프+유리" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=马卡龙玻璃台灯+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="74">
+      <div class="card-top">
+        <div class="card-img-placeholder">📔</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">다이어리 꾸미기 키트 (다꾸)</div>
+            <div class="card-cn">手账装饰套装</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">74%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:74%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>문구 · 다이어리</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>일본 시작 → 중국·한국 독자 발화</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2024 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>5천~3만 원 (키트)</span></div>
+          
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">'다꾸(다이어리 꾸미기)' 문화. 스티커·테이프·스탬프·폴라로이드 미니 사진 조합. 유튜브·틱톡 '다꾸 브이로그' 수백만 조회. 문구 시장의 새 주역.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">알리익스프레스 '手账套装' 한국 주문 급증. 다꾸 유튜버 구독자 수십만 명 성장. 교보문고·알라딘 문구 코너 확장.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">다꾸</span><span class="tag">스티커</span><span class="tag">문구</span><span class="tag">꾸미기</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=journal+decoration+kit+sticker+scrapbook" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=手账+装饰+套装+贴纸" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=다이어리꾸미기키트+다꾸" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=手账装饰套装+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="73">
+      <div class="card-top">
+        <div class="card-img-placeholder">🌕</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">달 3D 프린팅 무드등</div>
+            <div class="card-cn">月球灯3D打印</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">73%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:73%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>인테리어 · 조명</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>글로벌 동시</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>1~4만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">달 표면 질감을 3D 프린팅으로 재현한 무드등. 크기 선택 가능(10~30cm). USB 충전, 색상 변환. 침실·사무실 인테리어. 선물·기념일용으로 이름 각인 서비스도.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">글로벌 핀터레스트·인스타 'moon lamp' 조회수 꾸준. 알리익스프레스 장기 베스트셀러. 국내 선물샵 입점 지속.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">방꾸</span><span class="tag">조명</span><span class="tag">선물</span><span class="tag">3D프린팅</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=moon+lamp+3D+print+LED+night+light" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=月球灯+3D打印+LED" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=달무드등+3D" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=月球灯+3D打印+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="73">
+      <div class="card-top">
+        <div class="card-img-placeholder">🔷</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">자석 블록 조립 장난감</div>
+            <div class="card-cn">磁力片积木</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">73%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:73%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>장난감 · DIY</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>글로벌 동시</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2024 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>2~10만 원 (세트)</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">자석 내장 플라스틱 조각으로 3D 구조물 조립. 어린이 STEM 교육 장난감. 단순하게 시작해 무한 확장 가능. 부모 리뷰 영향으로 온라인 구전 강력.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">알리익스프레스 어린이 카테고리 연간 베스트셀러. 국내 STEM 교육 수요 급증. 맘카페 추천 선물 TOP5.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">장난감</span><span class="tag">STEM</span><span class="tag">블록</span><span class="tag">교육</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=magnetic+tiles+building+blocks+kids+STEM" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=磁力片+积木+儿童" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=자석블록+자석타일" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=磁力片积木+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="72">
+      <div class="card-top">
+        <img class="card-img"
+          src="https://search.pstatic.net/common/?type=b150&src=http%3A%2F%2Fshop1.phinf.naver.net%2F20260128_175%2F1769592712576sSVec_JPEG%2F51007906568832286_1840688742.jpg"
+          alt="Y2K 갸루 네일팁"
+          onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <div class="card-img-placeholder" style="display:none">💅</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">Y2K 갸루 네일팁</div>
+            <div class="card-cn">Y2K辣妹美甲贴片</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">72%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:72%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>패션 · 액세서리</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 선행</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>5천~2만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-8점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">샤오홍슈 Y2K 갸루 스타일 롱 네일팁. 화려한 크리스탈·3D 장식. 셀프 네일 수요 증가와 맞물려 빠르게 확산.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">2025년 샤오홍슈 발원 후 인스타·틱톡 '갸루네일' 확산. 네이버 블로그 셀프네일 콘텐츠 급증. 소품샵 베스트셀러 등극.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">Y2K</span><span class="tag">네일</span><span class="tag">뷰티</span><span class="tag">셀프네일</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=Y2K+gal+nail+tips+crystal+3D" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=Y2K+辣妹+美甲贴片+水晶" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=갸루+네일팁+Y2K" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=Y2K辣妹美甲+贴片+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="72">
+      <div class="card-top">
+        <div class="card-img-placeholder">🖼️</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">아크릴 사진 스탠드</div>
+            <div class="card-cn">亚克力相框摆台</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">72%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:72%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>문구 · 인테리어</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 선행</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>3천~1만 원</span></div>
+          
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">아크릴 투명 소재의 얇고 미니멀한 사진 꽂이. 폴라로이드 사진·엽서·스티커 꽂아 책상 위 전시. '방꾸' 핵심 소품. 셀카·굿즈 사진 전시에 최적.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">다꾸·방꾸 커뮤니티 추천 아이템 1위. 알리익스프레스 생활 소품 상시 베스트. 다이소 유사품 출시.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">방꾸</span><span class="tag">사진</span><span class="tag">아크릴</span><span class="tag">인테리어</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=acrylic+photo+stand+frame+desk+display" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=亚克力+相框+摆台+透明" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=아크릴사진스탠드" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=亚克力相框摆台+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="70">
+      <div class="card-top">
+        <div class="card-img-placeholder">🌌</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">별자리 갤럭시 프로젝터</div>
+            <div class="card-cn">星空投影仪</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">70%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:70%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>인테리어 · 조명</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 제조 · 글로벌</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2024 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>2~5만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">천장에 별·은하수·오로라를 투영. 회전 기능, 무드음악 연동 모델도 있음. '방 안 우주' 감성으로 MZ세대 방꾸 필수품. 유튜브·인스타 룸투어 콘텐츠 단골 등장.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">알리익스프레스 조명 카테고리 연간 베스트셀러. 국내 쿠팡·네이버 쇼핑 판매량 지속 상위. 룸투어 틱톡 영상 단골 소품.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">방꾸</span><span class="tag">조명</span><span class="tag">우주</span><span class="tag">인테리어</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=galaxy+star+projector+night+light+room" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=星空投影仪+氛围灯" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=별자리프로젝터" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=星空投影仪+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="70">
+      <div class="card-top">
+        <div class="card-img-placeholder">🟢</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">슬라임 DIY 키트</div>
+            <div class="card-cn">史莱姆DIY套装</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">70%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:70%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>장난감 · DIY</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>글로벌 동시</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2024 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>1~3만 원 (키트)</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">풀·글리터·구슬로 직접 슬라임 만들기 키트. 유튜브·틱톡 슬라임 ASMR 영상 조회수 수억. 색상·질감 커스텀 재미. 어린이 파티·생일 선물 단골 아이템.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">알리익스프레스 슬라임 DIY 한국 주문 연 지속. 다이소 슬라임 재료 섹션 확장. 어린이 생일 선물 온라인 추천 TOP.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">장난감</span><span class="tag">DIY</span><span class="tag">ASMR</span><span class="tag">슬라임</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=slime+DIY+kit+kids+glitter+fluffy" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=史莱姆+DIY+套装+儿童" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=슬라임DIY키트" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=史莱姆DIY套装+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="68">
+      <div class="card-top">
+        <div class="card-img-placeholder">📸</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">폴라로이드 클립 줄 조명</div>
+            <div class="card-cn">照片夹子串灯</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★☆☆</span>
+            <span class="prob-pct" style="color:#4d83c7">68%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:68%;background:#4d83c7"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>인테리어 · 방꾸</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>글로벌 동시</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2024 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>5천~2만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">전구 줄에 나무 집게가 달린 조명. 사진·편지·엽서를 꽂아 벽 꾸미기. 따뜻한 웜 화이트 빛. 대학 기숙사·자취방 필수 아이템. 졸업·입학 선물로도 인기.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">알리익스프레스 방꾸 소품 연간 베스트셀러. 다이소 유사품 품절 반복. 틱톡 룸투어 영상 80% 이상 등장.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">방꾸</span><span class="tag">조명</span><span class="tag">사진</span><span class="tag">인테리어</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=photo+clip+string+lights+LED+wall+decor" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=照片夹子串灯+装饰" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=사진클립조명+줄전구" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=照片夹子串灯+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="hot" data-prob="68">
+      <div class="card-top">
+        <div class="card-img-placeholder">🧊</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">동물 모양 얼음틀</div>
+            <div class="card-cn">动物造型制冰盒</div>
+          </div>
+          <div class="stage-badge" style="background:#fff8ee;color:#cf8d2e">📈 유행</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★☆☆</span>
+            <span class="prob-pct" style="color:#4d83c7">68%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:68%;background:#4d83c7"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>주방 · 생활</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>글로벌 동시</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2024 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>5천~2만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">공룡·상어·곰 모양으로 얼음이 만들어지는 실리콘 얼음틀. 아이들 간식·음료 인스타 인증샷 소재. '집꾸' 라이프스타일과 함께 실용+재미 아이템으로 자리매김.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">알리익스프레스 키친 카테고리 꾸준한 베스트셀러. 다이소 유사품 반복 품절. 인스타·틱톡 '음료 꾸미기' 영상 필수 소품.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">주방</span><span class="tag">얼음틀</span><span class="tag">귀여운</span><span class="tag">생활</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=animal+ice+cube+tray+silicone+cute" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=动物造型+制冰盒+硅胶" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=동물얼음틀+실리콘" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=动物制冰盒+硅胶+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="season" data-prob="72">
+      <div class="card-top">
+        <div class="card-img-placeholder">💨</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">넥밴드 휴대용 선풍기</div>
+            <div class="card-cn">挂脖风扇</div>
+          </div>
+          <div class="stage-badge" style="background:#eef4ff;color:#4d83c7">☀️ 시즌 피크</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">72%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:72%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>주방 · 생활가전</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 제조 · 글로벌</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2026년 5월 ~ 8월</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>1~4만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-5점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">목에 거는 핸즈프리 미니 선풍기. 무선·USB 충전. 야외 행사·등교·운동 시 사용. 매년 여름 필수 소싱 아이템. 중국산 가성비 모델이 압도적 점유율.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">쿠팡·네이버 쇼핑 여름 시즌 TOP 상품. 알리익스프레스 여름 카테고리 연간 1위. 한국 편의점·다이소 입점.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">선풍기</span><span class="tag">여름</span><span class="tag">휴대용</span><span class="tag">생활가전</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=neck+fan+portable+bladeless+USB+cooling" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=挂脖风扇+无叶+USB充电" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=넥밴드선풍기+휴대용" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=挂脖风扇+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="season" data-prob="65">
+      <div class="card-top">
+        <div class="card-img-placeholder">🧊</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">아이스 조끼 (냉풍 조끼)</div>
+            <div class="card-cn">冰感降温背心</div>
+          </div>
+          <div class="stage-badge" style="background:#eef4ff;color:#4d83c7">☀️ 시즌 피크</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★☆☆</span>
+            <span class="prob-pct" style="color:#4d83c7">65%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:65%;background:#4d83c7"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>패션 · 실용 아이템</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>실용 수요 + 중국 제조</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2026년 5월 ~ 2026년 8월</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>2~5만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">기록적 여름 폭염 + 야외활동·워터밤 시즌. 냉풍 기술 개선으로 가성비 향상. 실용적 더위 해결 + 미디어 보도.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">7.1 블로그 '대유행인 필수 인기템' 직접 언급. 스위스밀리터리 SMIV-100 등 신제품 '2026 여름 시장 겨냥' 출시 확인.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">여름</span><span class="tag">실용</span><span class="tag">아웃도어</span><span class="tag">폭염</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=ice+cooling+vest+summer+outdoor" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=冰感+降温背心+夏季" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=아이스조끼+냉풍" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=冰感降温背心+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="rising" data-prob="82">
+      <div class="card-top">
+        <div class="card-img-placeholder">🎀</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">프릴 · 레이스 탑</div>
+            <div class="card-cn">荷叶边蕾丝上衣</div>
+          </div>
+          <div class="stage-badge" style="background:#eef4ff;color:#4d83c7">🌱 상승 중</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">82%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:82%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>패션 · 상의</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>발레코어 트렌드 연장</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2026년 4월 ~ 2026년 9월</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>2~5만 원</span></div>
+          
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">발레코어 트렌드 연장 + 보헤미안 미학 결합. 자라·HS 등 글로벌 SPA 2026SS 라인 반영. 우아함·섹시함 균형 + 셀럽 착용 + '러블리 청순핫걸' 무드.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">7월 위시리스트 블로그 다수. '#레이스탑 #발레코어' 해시태그 조회수 증가. 무신사 주간 베스트 진입.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">여름패션</span><span class="tag">발레코어</span><span class="tag">레이스</span><span class="tag">상의</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=frill+lace+top+camisole+ballet+core" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=荷叶边+蕾丝+上衣" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=프릴탑+레이스탑" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=荷叶边蕾丝上衣+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="rising" data-prob="80">
+      <div class="card-top">
+        <div class="card-img-placeholder">🪼</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">해파리 LED 무드등</div>
+            <div class="card-cn">水母氛围灯</div>
+          </div>
+          <div class="stage-badge" style="background:#eef4ff;color:#4d83c7">🌱 상승 중</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">80%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:80%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>인테리어 · 조명</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 선행</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025년 하반기 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>2~5만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">아크릴 수조 안에서 해파리가 떠다니듯 움직이는 LED 조명. 색상 변환·터치 조작. 수족관 분위기를 방 안에. '치유 인테리어' 트렌드와 딱 맞아떨어짐.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">샤오홍슈 '水母灯' 조회수 수백만. 알리익스프레스 조명 카테고리 급성장 아이템. 한국 방꾸 인스타그램 등장 급증 중.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">방꾸</span><span class="tag">조명</span><span class="tag">수족관</span><span class="tag">치유</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=jellyfish+mood+lamp+LED+aquarium" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=水母+氛围灯+LED" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=해파리무드등" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=水母氛围灯+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="rising" data-prob="78">
+      <div class="card-top">
+        <div class="card-img-placeholder">🕹️</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">미니 뽑기 기계 (홈 클로 머신)</div>
+            <div class="card-cn">迷你夹娃娃机</div>
+          </div>
+          <div class="stage-badge" style="background:#eef4ff;color:#4d83c7">🌱 상승 중</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">78%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:78%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>감성 소품 · 장난감</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 선행</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025년 하반기 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>3~8만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-8점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">집에서 즐기는 미니어처 뽑기 기계. 코인 넣는 방식으로 실제 뽑기와 동일한 감각. 방꾸 아이템으로도 활용. 인형·피규어 넣어서 선물로도 인기. 숏폼 콘텐츠 소재로 최적.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">샤오홍슈 '桌面夹娃娃机' 조회수 급증. 알리익스프레스 베스트셀러 장난감 상위 진입. 한국 인테리어 틱톡 콘텐츠 등장 시작.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">뽑기</span><span class="tag">장난감</span><span class="tag">방꾸</span><span class="tag">선물</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=mini+claw+machine+home+toy" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=迷你+夹娃娃机+桌面" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=미니뽑기기계" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=迷你夹娃娃机+桌面+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="rising" data-prob="75">
+      <div class="card-top">
+        <div class="card-img-placeholder">🎁</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">크라이베이비 / 스컬판다 블라인드박스</div>
+            <div class="card-cn">泡泡玛特盲盒CryBaby</div>
+          </div>
+          <div class="stage-badge" style="background:#eef4ff;color:#4d83c7">🌱 상승 중</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">75%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:75%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>감성 소품 · 피규어</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 선행</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025년 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>1~3만 원 (박스당)</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-10점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">라부부 열풍 이후 팝마트 차기 주자. CryBaby(우는 아기)·Skullpanda(해골 판다) 시리즈. 블라인드 개봉 영상 콘텐츠 자체가 바이럴 소재. 수집·교환 문화 형성.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">라부부 이후 팝마트 한국 팝업 지속 확장. 팬덤 커뮤니티 결성. 네이버 블로그 '팝마트 크라이베이비' 게시물 증가.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">피규어</span><span class="tag">블라인드박스</span><span class="tag">수집</span><span class="tag">팝마트</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=pop+mart+blind+box+crybaby+skullpanda" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=泡泡玛特+盲盒+CryBaby" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=팝마트+블라인드박스" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=泡泡玛特盲盒+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="rising" data-prob="74">
+      <div class="card-top">
+        <div class="card-img-placeholder">🎀</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">새틴 리본 헤어밴드</div>
+            <div class="card-cn">缎带蝴蝶结发带</div>
+          </div>
+          <div class="stage-badge" style="background:#eef4ff;color:#4d83c7">🌱 상승 중</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">74%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:74%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>패션 · 액세서리</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>발레코어 · 클래식 걸 감성</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025년 하반기 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>3천~1만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">새틴 소재 넓은 리본 헤어밴드. 발레 감성 + '청순핫걸' 무드. 포니테일·하프업 어떤 헤어에도 매치. 에르메스 감성의 스카프형도 유행.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">핀터레스트 'satin ribbon hair' 조회수 급증. 무신사·에이블리 헤어 액세서리 상위. 소품샵 신규 입점 아이템 1순위.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">헤어액세서리</span><span class="tag">발레코어</span><span class="tag">리본</span><span class="tag">청순</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=satin+ribbon+hair+band+bow+ballet" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=缎带+蝴蝶结+发带+丝带" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=새틴리본+헤어밴드" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=缎带蝴蝶结发带+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="rising" data-prob="73">
+      <div class="card-top">
+        <div class="card-img-placeholder">👜</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">미니 크로스백 (Y2K 감성)</div>
+            <div class="card-cn">迷你斜挎包Y2K</div>
+          </div>
+          <div class="stage-badge" style="background:#eef4ff;color:#4d83c7">🌱 상승 중</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">73%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:73%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>패션 · 가방</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>Y2K 레트로 글로벌</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025년 하반기 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>2~5만 원</span></div>
+          
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">손바닥 크기의 초소형 크로스백. 체인 스트랩, 반짝이는 소재. 실용보다 패션 포인트용. 라부부·키링 달기 좋아 '가방꾸' 문화와 시너지.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">에이블리·지그재그 가방 카테고리 상위. 인스타 '#미니백 #가방꾸' 게시물 급증. 중국산 가성비 제품 알리 대량 유입.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">가방</span><span class="tag">Y2K</span><span class="tag">가방꾸</span><span class="tag">미니백</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=mini+crossbody+bag+Y2K+chain+strap" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=迷你+斜挎包+Y2K+链条" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=미니크로스백+Y2K" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=迷你斜挎包+Y2K+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="rising" data-prob="72">
+      <div class="card-top">
+        <div class="card-img-placeholder">🎨</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">점토 키링 DIY 세트</div>
+            <div class="card-cn">粘土钥匙扣DIY套装</div>
+          </div>
+          <div class="stage-badge" style="background:#eef4ff;color:#4d83c7">🌱 상승 중</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">72%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:72%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>감성 소품 · DIY</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>글로벌 동시</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025년 하반기 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>1~3만 원 (키트)</span></div>
+          
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">색색의 에어 클레이로 직접 키링·피규어 만들기. 핸드메이드 굿즈 유행과 맞물려 급성장. 완성품보다 과정을 공유하는 '만들기 영상' 콘텐츠가 바이럴. 소품샵 클래스로도 확장.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">인스타·틱톡 '클레이 키링 만들기' 콘텐츠 급증. 핀터레스트 DIY 아이디어 인기 상위. 오프라인 클레이 클래스 수강 대기 발생.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">DIY</span><span class="tag">클레이</span><span class="tag">키링</span><span class="tag">핸드메이드</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=clay+keyring+DIY+set+air+dry" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=粘土+钥匙扣+DIY+套装" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=점토키링+DIY" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=粘土钥匙扣DIY+材料包+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="rising" data-prob="70">
+      <div class="card-top">
+        <div class="card-img-placeholder">📼</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">레트로 카세트 블루투스 스피커</div>
+            <div class="card-cn">复古磁带蓝牙音箱</div>
+          </div>
+          <div class="stage-badge" style="background:#eef4ff;color:#4d83c7">🌱 상승 중</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">70%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:70%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>IT 소품 · 스피커</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>Y2K 레트로 글로벌</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025년 하반기 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>2~5만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">카세트테이프 외형의 블루투스 스피커. 실제 릴이 돌아가는 디자인. 레트로 인테리어 소품 + 실용 스피커 기능. 책상 방꾸 필수 아이템으로 등장.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">샤오홍슈 레트로 소품 콘텐츠 급증. 알리익스프레스 스피커 카테고리 신흥 히트. 한국 빈티지 인테리어 커뮤니티 추천.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">스피커</span><span class="tag">레트로</span><span class="tag">인테리어</span><span class="tag">Y2K</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=retro+cassette+bluetooth+speaker+vintage" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=复古磁带+蓝牙音箱" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=카세트블루투스스피커" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=复古磁带蓝牙音箱+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="rising" data-prob="70">
+      <div class="card-top">
+        <div class="card-img-placeholder">🐻</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">곰 도시락 박스 (벤토 박스)</div>
+            <div class="card-cn">小熊便当盒</div>
+          </div>
+          <div class="stage-badge" style="background:#eef4ff;color:#4d83c7">🌱 상승 중</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★★☆</span>
+            <span class="prob-pct" style="color:#cf8d2e">70%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:70%;background:#cf8d2e"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>주방 · 생활</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>글로벌 동시 (일본·중국 발원)</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>2~5만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">곰 얼굴·동물 모양 귀여운 스테인리스·플라스틱 도시락 박스. '점심 인증샷' 문화와 맞물려 도시락 박스 자체가 비주얼 아이템으로 부상. 다이어트·식단 관리 유행과 연계.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">틱톡 '밥 브이로그' 필수 소품. 알리익스프레스 키친 카테고리 성장. 한국 주부·직장인 커뮤니티 입소문.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">도시락</span><span class="tag">주방</span><span class="tag">귀여운</span><span class="tag">식단관리</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=cute+bear+bento+lunch+box+stainless" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=小熊+便当盒+可爱" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=곰도시락통+귀여운" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=小熊便当盒+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="rising" data-prob="68">
+      <div class="card-top">
+        <div class="card-img-placeholder">🔖</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">씰 스탬프 세트 (도장)</div>
+            <div class="card-cn">印章套装</div>
+          </div>
+          <div class="stage-badge" style="background:#eef4ff;color:#4d83c7">🌱 상승 중</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★☆☆</span>
+            <span class="prob-pct" style="color:#4d83c7">68%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:68%;background:#4d83c7"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>문구 · 다이어리</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국·일본 발원</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>5천~3만 원 (세트)</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">꽃·별·동물·감성 문구 도장 세트. 다꾸·편지지 꾸미기 핵심 아이템. 잉크 색상도 다양해져 레이어드 가능. 중국산 가성비 세트가 국내 문구점 가격 대비 압도적.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">알리익스프레스 문구 카테고리 한국 구매 상위 지속. 다꾸 유튜브 영상 필수 아이템. 소품샵·문구샵 신규 입점 아이템.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">문구</span><span class="tag">다꾸</span><span class="tag">스탬프</span><span class="tag">도장</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=seal+stamp+set+scrapbook+decoration" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=印章+套装+手账+盖章" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=씰스탬프+도장세트" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=印章套装+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="rising" data-prob="67">
+      <div class="card-top">
+        <div class="card-img-placeholder">🍄</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">버섯 미니 가습기</div>
+            <div class="card-cn">蘑菇迷你加湿器</div>
+          </div>
+          <div class="stage-badge" style="background:#eef4ff;color:#4d83c7">🌱 상승 중</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★☆☆</span>
+            <span class="prob-pct" style="color:#4d83c7">67%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:67%;background:#4d83c7"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>인테리어 · 생활가전</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 선행</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025년 하반기 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>1~3만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">버섯 모양 귀여운 소형 USB 가습기. 방꾸 인테리어 소품으로도 활용. 아로마 오일 호환 모델 인기. '데스크 가습기' 수요 증가와 맞물림. 겨울 건조 시즌 필수품.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">샤오홍슈 '蘑菇加湿器' 콘텐츠 급증. 알리익스프레스 생활가전 신흥 히트. 한국 방꾸 커뮤니티 추천 아이템 등장.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">생활가전</span><span class="tag">방꾸</span><span class="tag">데스크</span><span class="tag">버섯</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=mushroom+mini+humidifier+USB+cute+desk" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=蘑菇+迷你加湿器+USB" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=버섯가습기+미니" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=蘑菇迷你加湿器+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="rising" data-prob="65">
+      <div class="card-top">
+        <div class="card-img-placeholder">✨</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">아크릴 감성 LED 조명 글자</div>
+            <div class="card-cn">亚克力LED发光字</div>
+          </div>
+          <div class="stage-badge" style="background:#eef4ff;color:#4d83c7">🌱 상승 중</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★☆☆</span>
+            <span class="prob-pct" style="color:#4d83c7">65%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:65%;background:#4d83c7"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>인테리어 · 조명</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>글로벌 동시</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>2~8만 원</span></div>
+          
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">네온사인 느낌의 아크릴 조명. 원하는 문구·이름으로 커스텀 가능. 카페·홈파티·방꾸 인증샷 배경으로 인기. 돌잔치·생일파티용 맞춤 주문 수요도.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">인스타그램 홈파티·브런치 카페 콘텐츠 단골 등장. 알리익스프레스 주문제작 조명 카테고리 성장. 한국 맞춤 제작 업체 경쟁 심화.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">인테리어</span><span class="tag">조명</span><span class="tag">커스텀</span><span class="tag">방꾸</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=acrylic+LED+neon+sign+custom+light" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=亚克力+LED+发光字+定制" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=아크릴LED조명+네온사인" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=亚克力LED发光字+定制+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="rising" data-prob="65">
+      <div class="card-top">
+        <div class="card-img-placeholder">🏖️</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">키네틱 샌드 (움직이는 모래)</div>
+            <div class="card-cn">动力沙玩具</div>
+          </div>
+          <div class="stage-badge" style="background:#eef4ff;color:#4d83c7">🌱 상승 중</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★☆☆</span>
+            <span class="prob-pct" style="color:#4d83c7">65%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:65%;background:#4d83c7"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>장난감 · DIY</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>글로벌 동시</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2025 ~ 2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>1~3만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-5점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">손으로 만지면 찰흙처럼 뭉쳐지고, 부스러지는 마법 같은 모래 장난감. 틱톡 ASMR 영상 조회수 수억. 스트레스 해소·촉감 놀이. 어린이부터 성인까지 폭넓은 수요.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">틱톡 '#kineticsand' 조회수 수십억. 알리익스프레스 장난감 카테고리 상위. 한국 어린이 선물 추천 목록 단골 등장.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">장난감</span><span class="tag">ASMR</span><span class="tag">촉감</span><span class="tag">스트레스해소</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=kinetic+sand+toy+ASMR+stress+relief" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=动力沙+玩具+减压" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=키네틱샌드" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=动力沙玩具+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="early" data-prob="62">
+      <div class="card-top">
+        <div class="card-img-placeholder">🍓</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">꿀딸기 / 과일 스퀴시 볼</div>
+            <div class="card-cn">草莓捏捏球解压</div>
+          </div>
+          <div class="stage-badge" style="background:#f5f0ff;color:#9a6fc7">👀 초기 신호</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★☆☆</span>
+            <span class="prob-pct" style="color:#4d83c7">62%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:62%;background:#4d83c7"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>감성 소품 · 피젯 토이</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 선행</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2026년 상반기 ~ 하반기</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>2~4천 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-3점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">딸기·망고·포도 등 과일 모양 말랑 젤리 스퀴시볼. 투명 젤리 소재에 과일 씨앗·과육 디테일. 말랑이의 질감 업그레이드 버전. 과일 특유의 비주얼이 SNS 친화적.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">샤오홍슈 '捏捏球' 과일 계열 조회수 급증. 알리익스프레스 피젯 카테고리 신흥 베스트셀러.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">피젯토이</span><span class="tag">스퀴시</span><span class="tag">과일</span><span class="tag">젤리</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=strawberry+squishy+ball+jelly+fidget" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=草莓+捏捏球+解压" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=딸기스퀴시볼" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=草莓捏捏球+解压+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="early" data-prob="60">
+      <div class="card-top">
+        <div class="card-img-placeholder">🕐</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">픽셀 LED 탁상 시계</div>
+            <div class="card-cn">像素点阵LED时钟</div>
+          </div>
+          <div class="stage-badge" style="background:#f5f0ff;color:#9a6fc7">👀 초기 신호</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★☆☆</span>
+            <span class="prob-pct" style="color:#4d83c7">60%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:60%;background:#4d83c7"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>인테리어 · IT 소품</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 선행</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>3~7만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-5점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">8비트 픽셀 아트 스타일로 시간·날씨·온도를 표시하는 탁상 시계. 이미지·애니메이션 커스터마이징 가능. 레트로 게임 감성. 책상 방꾸 핵심 아이템으로 부상 중.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">샤오홍슈·더우인 '桌面时钟' 픽셀 버전 콘텐츠 폭증. 알리익스프레스 '픽셀 clock' 리뷰 급증. 국내 게이밍 유튜버 서브컬처로 소개 시작.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">인테리어</span><span class="tag">시계</span><span class="tag">레트로</span><span class="tag">픽셀</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=pixel+LED+clock+8bit+desk+display" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=像素点阵+LED时钟+桌面" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=픽셀시계+LED" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=像素点阵时钟+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="early" data-prob="58">
+      <div class="card-top">
+        <div class="card-img-placeholder">🍳</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">미니어처 주방 소품 세트</div>
+            <div class="card-cn">微型厨房摆件套装</div>
+          </div>
+          <div class="stage-badge" style="background:#f5f0ff;color:#9a6fc7">👀 초기 신호</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★☆☆</span>
+            <span class="prob-pct" style="color:#4d83c7">58%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:58%;background:#4d83c7"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>감성 소품 · 미니어처</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 선행</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2026년 하반기</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>3~8천 원 (세트)</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-8점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">손바닥 크기의 미니어처 냉장고·가스레인지·주전자 세트. 실제 작동(불 켜짐, 냉장고 문 열림)하는 모델도 있음. 책상 위 방꾸·인테리어로 활용. 유튜브 미니어처 채널 영향.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">중국 미니어처 요리 콘텐츠 글로벌 인기. 핀터레스트 미니어처 인테리어 조회수 꾸준히 상위. 국내 소품샵 입점 초기.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">미니어처</span><span class="tag">방꾸</span><span class="tag">인테리어</span><span class="tag">수집</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=miniature+kitchen+set+dollhouse+tiny" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=微型+厨房+摆件+套装" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=미니어처+주방세트" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=微型厨房摆件+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="early" data-prob="57">
+      <div class="card-top">
+        <div class="card-img-placeholder">🎒</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">LED 픽셀 백팩</div>
+            <div class="card-cn">LED像素背包</div>
+          </div>
+          <div class="stage-badge" style="background:#f5f0ff;color:#9a6fc7">👀 초기 신호</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★☆☆</span>
+            <span class="prob-pct" style="color:#4d83c7">57%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:57%;background:#4d83c7"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>IT 소품 · 가방</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>중국 선행</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2026년</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>5~15만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-5점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">가방 등판에 프로그래밍 가능한 LED 픽셀 디스플레이 내장. 스마트폰 앱으로 그림·텍스트·이모지 표시. 야간 이동 시 존재감. 게이밍·서브컬처 커뮤니티 관심 증가.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">더우인 LED 백팩 콘텐츠 바이럴. 알리익스프레스 '픽셀 배낭' 리뷰 급증. 국내 게이밍 커뮤니티 소개 초기.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">백팩</span><span class="tag">LED</span><span class="tag">픽셀</span><span class="tag">게이밍</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=LED+pixel+backpack+programmable+display" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=LED像素屏+背包+发光" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=LED픽셀백팩" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=LED像素背包+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+
+    <div class="card" data-stage="early" data-prob="52">
+      <div class="card-top">
+        <div class="card-img-placeholder">💍</div></div>
+      <div class="card-body">
+        <div class="card-header-row">
+          <div>
+            <div class="card-name">옥반지 (레트로 주얼리)</div>
+            <div class="card-cn">翡翠戒指复古首饰</div>
+          </div>
+          <div class="stage-badge" style="background:#f5f0ff;color:#9a6fc7">👀 초기 신호</div>
+        </div>
+
+        <div class="prob-section">
+          <div class="prob-row">
+            <span class="prob-label">한국 유행 가능성</span>
+            <span class="stars">★★★☆☆</span>
+            <span class="prob-pct" style="color:#9a6fc7">52%</span>
+          </div>
+          <div class="prob-track">
+            <div class="prob-fill" style="width:52%;background:#9a6fc7"></div>
+          </div>
+        </div>
+
+        <div class="info-rows">
+          <div class="info-row"><span class="info-key">카테고리</span><span>패션 · 액세서리</span></div>
+          <div class="info-row"><span class="info-key">유행 패턴</span><span>국내 레트로 트렌드 자생</span></div>
+          <div class="info-row"><span class="info-key">유행 시기</span><span>2026년 5월 ~ 2026년 12월</span></div>
+          <div class="info-row"><span class="info-key">소싱 가격대</span><span>5천~2만 원</span></div>
+          <div class='info-row'><span class='info-key'>중국어 감점</span><span style='color:#c9624f;font-weight:700'>-5점</span></div>
+        </div>
+
+        <div class="why-box">
+          <div class="why-label">왜 한국에서 뜰까?</div>
+          <div class="why-text">아날로그 레트로 소비 흐름 + 동묘·구제 쇼핑 트렌드. 가성비 + 레트로·한국적 이미지 + 연예인 착용 + SNS 인증샷 욕구.</div>
+        </div>
+
+        <div class="evidence-box">
+          <div class="evidence-label">근거</div>
+          <div class="evidence-text">6.25 '갑자기 옥반지가 다시 뜨는 이유' 분석 블로그. 동묘 2030 방문 트렌드 기사 증가. 더쿠 언급 증가 초기 포착.</div>
+        </div>
+
+        <div class="tags-row"><span class="tag">주얼리</span><span class="tag">레트로</span><span class="tag">Y2K</span><span class="tag">빈티지</span></div>
+
+        <div class="src-links"><a class="src-link ali" href="https://www.aliexpress.com/wholesale?SearchText=jade+ring+retro+vintage+green" target="_blank">AliExpress</a><a class="src-link taobao" href="https://s.taobao.com/search?q=翡翠+戒指+复古" target="_blank">Taobao</a><a class="src-link naver" href="https://search.shopping.naver.com/search/all?query=옥반지+레트로" target="_blank">네이버 쇼핑</a><a class="src-link s1688" href="https://s.1688.com/selloffer/offer_search.htm?keywords=翡翠戒指+复古首饰+批发" target="_blank">1688</a></div>
+
+        <div class="added-date">등록일 2026-07-02</div>
+      </div>
+    </div>
+    <div class="no-results hidden" id="no-results">해당 조건의 제품이 없습니다.</div>
+  </div>
+</main>
+
+<footer>
+  데이터 출처: 네이버 검색, 중국 마케팅 분석, 샤오홍슈·더우인 트렌드 종합 분석<br>
+  소싱 링크는 키워드 기반이며 가격·재고는 변동될 수 있습니다. 최종 확인은 직접 플랫폼에서 해주세요.<br><br>
+  마지막 빌드: 2026년 07월 03일 02:57
+</footer>
+
+<!-- ══════════ 지표 설명 모달 ══════════ -->
+<div class="modal-backdrop" id="modal-backdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+
+    <div class="modal-header">
+      <div>
+        <h2 id="modal-title">📊 유행 가능성 채점 기준</h2>
+        <p>한국 유행 가능성(%) 산출에 사용되는 지표와 가중치입니다. (가점 6개 + 보정 1개 + <span style="color:#ff9f8a">감점 1개</span>)<br>
+           매주 월·목 자동 업데이트 시 이 기준으로 Claude AI가 신규 제품을 채점합니다.</p>
+      </div>
+      <button class="modal-close" id="close-modal" aria-label="닫기">✕</button>
+    </div>
+
+    <div class="modal-body">
+
+      <!-- 가중치 요약 바 -->
+      <div class="weight-summary">
+        <h3>가중치 한눈에 보기</h3>
+        <div class="weight-bars">
+          <div class="wb-row">
+            <span class="wb-label">① 중국 플랫폼 바이럴</span>
+            <div class="wb-track"><div class="wb-fill" style="width:25%;background:#e25f48"></div></div>
+            <span class="wb-pct" style="color:#e25f48">25%</span>
+          </div>
+          <div class="wb-row">
+            <span class="wb-label">② 한·중 트렌드 시차</span>
+            <div class="wb-track"><div class="wb-fill" style="width:20%;background:#cf8d2e"></div></div>
+            <span class="wb-pct" style="color:#cf8d2e">20%</span>
+          </div>
+          <div class="wb-row">
+            <span class="wb-label">③ 네이버 검색 신호</span>
+            <div class="wb-track"><div class="wb-fill" style="width:5%;background:#687078"></div></div>
+            <span class="wb-pct" style="color:#687078">5%</span>
+          </div>
+          <div class="wb-row">
+            <span class="wb-label">④ 한국 문화 적합성</span>
+            <div class="wb-track"><div class="wb-fill" style="width:25%;background:#4d83c7"></div></div>
+            <span class="wb-pct" style="color:#4d83c7">25%</span>
+          </div>
+          <div class="wb-row">
+            <span class="wb-label">⑤ 제품 확산력</span>
+            <div class="wb-track"><div class="wb-fill" style="width:15%;background:#9a6fc7"></div></div>
+            <span class="wb-pct" style="color:#9a6fc7">15%</span>
+          </div>
+          <div class="wb-row">
+            <span class="wb-label">⑥ 소싱 환경</span>
+            <div class="wb-track"><div class="wb-fill" style="width:10%;background:#1a7f4b"></div></div>
+            <span class="wb-pct" style="color:#1a7f4b">10%</span>
+          </div>
+          <div class="wb-row">
+            <span class="wb-label">⑦ 타이밍 보정</span>
+            <div class="wb-track"><div class="wb-fill" style="width:8%;background:#aaa;opacity:0.5"></div></div>
+            <span class="wb-pct" style="color:#aaa">±보정</span>
+          </div>
+          <div class="wb-row" style="border-top:1px dashed #e8e3da;padding-top:8px;margin-top:2px">
+            <span class="wb-label" style="color:#c9624f">⑧ 중국어 표기 감점</span>
+            <div class="wb-track" style="background:#fde8e4"><div class="wb-fill" style="width:15%;background:#c9624f"></div></div>
+            <span class="wb-pct" style="color:#c9624f">최대 −15</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 지표별 상세 (아코디언) -->
+      <div class="indicator-list">
+
+        <!-- 지표 1 -->
+        <div class="ind-card" data-idx="0">
+          <div class="ind-head">
+            <div class="ind-num">1</div>
+            <div class="ind-title">
+              <div class="ind-name">중국 플랫폼 바이럴 강도</div>
+              <div class="ind-meta">샤오홍슈 · 더우인 · 글로벌 틱톡 조회수</div>
+            </div>
+            <span class="ind-badge" style="background:#fff1ee;color:#e25f48">25점</span>
+            <span class="ind-chevron">▼</span>
+          </div>
+          <div class="ind-body">
+            <div class="ind-why">
+              중국 SNS 바이럴 → 한국 상륙의 시차는 보통 <strong>6개월~1년</strong>입니다.
+              즉, 지금 중국에서 폭발하고 있는 제품이 내년 한국 소품샵에 깔릴 가능성이 높아요.
+              가장 빠른 <strong>선행 지표</strong>이기 때문에 가중치를 최고로 설정했습니다.
+            </div>
+            <table class="score-table">
+              <tr><th>조건</th><th>점수</th></tr>
+              <tr><td>샤오홍슈 1억↑ / 더우인 해시태그 10억↑</td><td class="s-pts">25점</td></tr>
+              <tr><td>조회수 1,000만↑</td><td class="s-pts">18점</td></tr>
+              <tr><td>조회수 100만↑</td><td class="s-pts">12점</td></tr>
+              <tr><td>조회수 10만↑</td><td class="s-pts">6점</td></tr>
+              <tr><td>확인 불가 / 초기 단계</td><td class="s-pts">3점</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- 지표 2 -->
+        <div class="ind-card" data-idx="1">
+          <div class="ind-head">
+            <div class="ind-num">2</div>
+            <div class="ind-title">
+              <div class="ind-name">한국-중국 트렌드 시차</div>
+              <div class="ind-meta">중국 유행 중 + 한국 미진입 여부</div>
+            </div>
+            <span class="ind-badge" style="background:#fff8ee;color:#cf8d2e">20점</span>
+            <span class="ind-chevron">▼</span>
+          </div>
+          <div class="ind-body">
+            <div class="ind-why">
+              소싱 골든타임 판단 지표입니다. <strong>다이소에 입점되기 직전 1~3개월</strong>이
+              마진이 가장 높은 구간이에요. 중국 피크 + 한국 미진입 상태일 때
+              가장 높은 점수를 주는 이유입니다.
+            </div>
+            <table class="score-table">
+              <tr><th>상태</th><th>점수</th></tr>
+              <tr><td>중국 피크 + 한국 미진입</td><td class="s-pts">20점</td></tr>
+              <tr><td>중국 피크 + 한국 초기 신호</td><td class="s-pts">14점</td></tr>
+              <tr><td>글로벌 동시 발화</td><td class="s-pts">8점</td></tr>
+              <tr><td>이미 한국에서도 유행 중</td><td class="s-pts">4점</td></tr>
+              <tr><td>한국 포화 · 다이소 입점</td><td class="s-pts">1점</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- 지표 3 -->
+        <div class="ind-card" data-idx="2">
+          <div class="ind-head">
+            <div class="ind-num">3</div>
+            <div class="ind-title">
+              <div class="ind-name">네이버 검색·쇼핑 신호</div>
+              <div class="ind-meta">블로그 게시물 수 · 검색량 증가율</div>
+            </div>
+            <span class="ind-badge" style="background:#f2f2f2;color:#687078">5점</span>
+            <span class="ind-chevron">▼</span>
+          </div>
+          <div class="ind-body">
+            <div class="ind-why">
+              네이버 검색량은 유행이 <strong>이미 시작된 뒤에야</strong> 올라가는
+              후행 지표입니다. 선행 탐지가 목적인 이 시스템에서는 낮은 가중치(5%)를 부여해
+              참고 정도로만 활용합니다. 검색량이 이미 높다면 소싱 기회가
+              줄어든 신호로 읽을 수도 있어요.
+            </div>
+            <table class="score-table">
+              <tr><th>조건</th><th>점수</th></tr>
+              <tr><td>블로그 월 500건↑ + 검색량 전월비 200%↑</td><td class="s-pts">5점</td></tr>
+              <tr><td>블로그 100건↑ 또는 검색량 100%↑</td><td class="s-pts">3점</td></tr>
+              <tr><td>블로그 10~100건</td><td class="s-pts">2점</td></tr>
+              <tr><td>거의 없음 (초기)</td><td class="s-pts">1점</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- 지표 4 -->
+        <div class="ind-card" data-idx="3">
+          <div class="ind-head">
+            <div class="ind-num">4</div>
+            <div class="ind-title">
+              <div class="ind-name">한국 소비자 문화 적합성</div>
+              <div class="ind-meta">귀여움 · SNS 친화성 · 가성비 · 채널 적합성</div>
+            </div>
+            <span class="ind-badge" style="background:#eef4ff;color:#4d83c7">25점</span>
+            <span class="ind-chevron">▼</span>
+          </div>
+          <div class="ind-body">
+            <div class="ind-why">
+              같은 중국 유행 제품이라도 한국에서 터지는 것과 안 터지는 것이 갈리는
+              핵심 이유가 여기에 있습니다. 한국 시장은 <strong>"귀엽고 + SNS에 올리기 좋고 +
+              저렴하면"</strong> 폭발적으로 퍼지는 구조예요. 가중치를 25%로 높인 이유입니다.
+              아래 5개 항목을 해당하는 만큼 합산합니다.
+            </div>
+            <table class="score-table">
+              <tr><th>항목</th><th>점수</th></tr>
+              <tr><td>귀여운 · 아기자기 · 감성 비주얼</td><td class="s-pts">+8점</td></tr>
+              <tr><td>SNS 인증샷 · 숏폼 영상 소재 적합</td><td class="s-pts">+7점</td></tr>
+              <tr><td>가성비 (원가 대비 체감 가치 높음)</td><td class="s-pts">+5점</td></tr>
+              <tr><td>기존 한국 유행의 연장선 (예: 말랑이→두쫀쿠)</td><td class="s-pts">+3점</td></tr>
+              <tr><td>다이소·소품샵 채널로 유통 가능</td><td class="s-pts">+2점</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- 지표 5 -->
+        <div class="ind-card" data-idx="4">
+          <div class="ind-head">
+            <div class="ind-num">5</div>
+            <div class="ind-title">
+              <div class="ind-name">제품 확산력 (가격 · 비주얼)</div>
+              <div class="ind-meta">소비자가 기준 충동구매 허들</div>
+            </div>
+            <span class="ind-badge" style="background:#f5f0ff;color:#9a6fc7">15점</span>
+            <span class="ind-chevron">▼</span>
+          </div>
+          <div class="ind-body">
+            <div class="ind-why">
+              <strong>1만 원 미만 제품은 SNS 바이럴만으로 폭발적으로 퍼집니다.</strong>
+              "이거 사야 해?" 고민 없이 바로 구매로 이어지기 때문이에요.
+              가격대가 확산 속도에 직결되므로 15%로 상향했습니다.
+              단, 라부부처럼 팬덤이 형성된 수집 아이템은 고가여도 예외 보정이 적용됩니다.
+            </div>
+            <table class="score-table">
+              <tr><th>소비자가</th><th>점수</th></tr>
+              <tr><td>1만 원 미만 (충동구매 가능)</td><td class="s-pts">15점</td></tr>
+              <tr><td>1~3만 원</td><td class="s-pts">10점</td></tr>
+              <tr><td>3~10만 원</td><td class="s-pts">6점</td></tr>
+              <tr><td>10만 원 초과</td><td class="s-pts">2점</td></tr>
+              <tr><td>수집 아이템 · 팬덤 형성 시 보정</td><td class="s-pts">+3점</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- 지표 6 -->
+        <div class="ind-card" data-idx="5">
+          <div class="ind-head">
+            <div class="ind-num">6</div>
+            <div class="ind-title">
+              <div class="ind-name">소싱 환경</div>
+              <div class="ind-meta">1688 · 알리익스프레스 소싱 가능성 · IP 이슈</div>
+            </div>
+            <span class="ind-badge" style="background:#eef8f0;color:#1a7f4b">10점</span>
+            <span class="ind-chevron">▼</span>
+          </div>
+          <div class="ind-body">
+            <div class="ind-why">
+              아이디어가 좋아도 실제로 소싱이 안 되면 의미가 없습니다.
+              또한 IP·특허 문제가 있으면 통관 단계에서 막히거나
+              리스크가 발생할 수 있어요. <strong>40점 미만 제품은 목록에 올리지 않습니다.</strong>
+            </div>
+            <table class="score-table">
+              <tr><th>조건</th><th>점수</th></tr>
+              <tr><td>1688·알리 대량 소싱 가능 + IP 문제 없음</td><td class="s-pts">10점</td></tr>
+              <tr><td>소싱 가능하나 MOQ 높거나 배송 복잡</td><td class="s-pts">6점</td></tr>
+              <tr><td>IP·특허 불확실</td><td class="s-pts">4점</td></tr>
+              <tr><td>소싱 불가 (특허 브랜드만 존재)</td><td class="s-pts">0점</td></tr>
+            </table>
+          </div>
+        </div>
+
+        <!-- 지표 8 (감점) -->
+        <div class="ind-card" data-idx="7" style="border-color:#f5cdc7">
+          <div class="ind-head" style="background:#fff8f7">
+            <div class="ind-num" style="background:#c9624f">8</div>
+            <div class="ind-title">
+              <div class="ind-name">중국어 표기·브랜드 노출 감점</div>
+              <div class="ind-meta">포장·제품의 중국어·중국 브랜드 노출 정도</div>
+            </div>
+            <span class="ind-badge" style="background:#fff1ee;color:#c9624f">최대 −15점</span>
+            <span class="ind-chevron">▼</span>
+          </div>
+          <div class="ind-body">
+            <div class="ind-why" style="border-left-color:#c9624f;background:#fff8f7;color:#7a2a2a">
+              한국 소비자는 제품·포장에 중국어가 대놓고 적혀 있거나
+              <strong>중국 브랜드임이 한눈에 보이면 호감도가 낮아집니다.</strong>
+              "메이드 인 차이나"는 용인하더라도, 패키징이 중국어로 가득하면
+              선뜻 구매를 꺼리는 경향이 있어요.
+              이 지표는 이 시스템의 <strong>유일한 감점 지표</strong>입니다.
+            </div>
+            <table class="score-table">
+              <tr><th>조건</th><th>감점</th></tr>
+              <tr><td>포장·제품에 중국어 없음, 브랜드 중립</td><td class="s-pts" style="color:#1a7f4b">0점</td></tr>
+              <tr><td>영문 브랜드이나 포장에 중국어 소량 표기</td><td class="s-pts" style="color:#cf8d2e">−5점</td></tr>
+              <tr><td>포장에 중국어 상당량 또는 중국 브랜드 로고 노출</td><td class="s-pts" style="color:#c9624f">−10점</td></tr>
+              <tr><td>완전 중국어 제품·패키징 또는 중국 대표 브랜드 (팝마트 등)</td><td class="s-pts" style="color:#e25f48">−15점</td></tr>
+            </table>
+          </div>
+        </div>
+
+      </div><!-- /indicator-list -->
+
+      <!-- 점수 → 확률 변환 -->
+      <div class="prob-map">
+        <h3>최종 점수 → 유행 가능성 % 변환</h3>
+        <div class="prob-map-grid">
+          <div class="pm-item"><div class="pm-dot" style="background:#e25f48"></div><span><strong>85~95%</strong> — 대유행 / 피크</span></div>
+          <div class="pm-item"><div class="pm-dot" style="background:#cf8d2e"></div><span><strong>70~84%</strong> — 유행 / 상승 중</span></div>
+          <div class="pm-item"><div class="pm-dot" style="background:#4d83c7"></div><span><strong>55~69%</strong> — 초기 신호</span></div>
+          <div class="pm-item"><div class="pm-dot" style="background:#9a6fc7"></div><span><strong>40~54%</strong> — 관망</span></div>
+          <div class="pm-item" style="grid-column:1/-1"><div class="pm-dot" style="background:#ddd"></div><span><strong>40점 미만</strong> — 목록 제외 (확산 가능성 낮음)</span></div>
+        </div>
+      </div>
+
+      <!-- 타이밍 보정 -->
+      <div>
+        <h3 style="font-size:13px;color:var(--muted);font-weight:700;margin-bottom:10px;">⑦ 타이밍 보정 (합산 점수에 가감)</h3>
+        <div class="timing-grid">
+          <div class="tm-item"><span class="tm-badge tm-neg">−15</span><span>다이소 입점 확인 (경쟁 과열)</span></div>
+          <div class="tm-item"><span class="tm-badge tm-pos">+5</span><span>소품샵 초기 입점 단계 (골든타임)</span></div>
+          <div class="tm-item"><span class="tm-badge tm-pos">+8</span><span>연예인 · 인플루언서 착용 확인</span></div>
+          <div class="tm-item"><span class="tm-badge tm-pos">+5</span><span>계절 · 시즌 맞물림</span></div>
+        </div>
+      </div>
+
+    </div><!-- /modal-body -->
+  </div><!-- /modal -->
+</div><!-- /modal-backdrop -->
+
+<script>
+/* ── 지표 설명 모달 ── */
+const backdrop  = document.getElementById("modal-backdrop");
+const openBtn   = document.getElementById("open-criteria");
+const closeBtn  = document.getElementById("close-modal");
+
+openBtn.addEventListener("click", () => backdrop.classList.add("open"));
+closeBtn.addEventListener("click", () => backdrop.classList.remove("open"));
+backdrop.addEventListener("click", e => { if (e.target === backdrop) backdrop.classList.remove("open"); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") backdrop.classList.remove("open"); });
+
+/* 아코디언 */
+document.querySelectorAll(".ind-head").forEach(head => {
+  head.addEventListener("click", () => {
+    const card = head.closest(".ind-card");
+    card.classList.toggle("open");
+  });
+});
+
+/* ── 필터 & 정렬 ── */
+const grid  = document.getElementById("cards-grid");
+const cards = Array.from(grid.querySelectorAll(".card"));
+const noRes = document.getElementById("no-results");
+let currentStage = "all";
+let currentSort  = "default";
+
+document.querySelectorAll(".filter-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+    btn.classList.add("active");
+    currentStage = btn.dataset.stage;
+    render();
+  });
+});
+
+document.getElementById("sort-select").addEventListener("change", e => {
+  currentSort = e.target.value;
+  render();
+});
+
+function render() {
+  let visible = cards.filter(c => {
+    if (currentStage === "all") return true;
+    return c.dataset.stage === currentStage;
+  });
+
+  if (currentSort === "prob-desc") {
+    visible.sort((a,b) => +b.dataset.prob - +a.dataset.prob);
+  } else if (currentSort === "prob-asc") {
+    visible.sort((a,b) => +a.dataset.prob - +b.dataset.prob);
+  } else if (currentSort === "newest") {
+    visible.reverse();
+  }
+
+  cards.forEach(c => c.classList.add("hidden"));
+  visible.forEach(c => c.classList.remove("hidden"));
+  noRes.classList.toggle("hidden", visible.length > 0);
+
+  // Re-append in sorted order
+  visible.forEach(c => grid.appendChild(c));
+  grid.appendChild(noRes);
+}
+</script>
+</body>
+</html>
