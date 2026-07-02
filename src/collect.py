@@ -1,9 +1,9 @@
 """
-collect.py — 네이버 API + Claude API로 신규 유행 제품 탐지 후 products.json 업데이트
+collect.py — 네이버 API + Gemini API로 신규 유행 제품 탐지 후 products.json 업데이트
 GitHub Actions에서 매주 월/목 자동 실행됨.
 
 필요한 환경변수 (GitHub Secrets):
-  ANTHROPIC_API_KEY
+  GEMINI_API_KEY
   NAVER_CLIENT_ID
   NAVER_CLIENT_SECRET
 """
@@ -21,7 +21,7 @@ DATA_FILE = ROOT / "data" / "products.json"
 
 NAVER_ID     = os.environ.get("NAVER_CLIENT_ID", "")
 NAVER_SECRET = os.environ.get("NAVER_CLIENT_SECRET", "")
-ANTHROPIC_KEY = os.environ.get("ANTHROPIC_API_KEY", "")
+GEMINI_KEY   = os.environ.get("GEMINI_API_KEY", "")
 
 SEARCH_QUERIES = [
     "중국 유행 제품 한국",
@@ -62,35 +62,32 @@ def clean_html(text: str) -> str:
 
 
 # ──────────────────────────────────────────────
-# Claude API
+# Gemini API
 # ──────────────────────────────────────────────
 
-def call_claude(prompt: str) -> str:
-    if not ANTHROPIC_KEY:
-        print("  [SKIP] Anthropic API 키 없음")
+def call_gemini(prompt: str) -> str:
+    if not GEMINI_KEY:
+        print("  [SKIP] Gemini API 키 없음")
         return "[]"
-    import urllib.request
+    url = (
+        "https://generativelanguage.googleapis.com/v1beta/models/"
+        f"gemini-1.5-flash:generateContent?key={GEMINI_KEY}"
+    )
     body = json.dumps({
-        "model": "claude-haiku-4-5-20251001",
-        "max_tokens": 2048,
-        "messages": [{"role": "user", "content": prompt}],
+        "contents": [{"parts": [{"text": prompt}]}],
+        "generationConfig": {"maxOutputTokens": 2048, "temperature": 0.7},
     }).encode()
     req = urllib.request.Request(
-        "https://api.anthropic.com/v1/messages",
-        data=body,
-        headers={
-            "x-api-key": ANTHROPIC_KEY,
-            "anthropic-version": "2023-06-01",
-            "content-type": "application/json",
-        },
+        url, data=body,
+        headers={"content-type": "application/json"},
         method="POST",
     )
     try:
         with urllib.request.urlopen(req, timeout=30) as res:
             data = json.loads(res.read())
-            return data["content"][0]["text"]
+            return data["candidates"][0]["content"]["parts"][0]["text"]
     except Exception as e:
-        print(f"  [ERROR] Claude API 실패: {e}")
+        print(f"  [ERROR] Gemini API 실패: {e}")
         return "[]"
 
 
@@ -239,8 +236,8 @@ def main():
 china_label_penalty는 지표8 기준으로 0, -5, -10, -15 중 하나를 선택하세요.
 JSON만 반환하고 다른 텍스트는 쓰지 마세요."""
 
-    print("  Claude 분석 중...")
-    response = call_claude(prompt)
+    print("  Gemini 분석 중...")
+    response = call_gemini(prompt)
 
     # 4. 파싱
     try:
