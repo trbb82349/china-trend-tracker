@@ -8,6 +8,10 @@ on:
     - cron: '0 0 * * 4'
   workflow_dispatch:  # 수동 실행 버튼 (테스트용)
 
+concurrency:
+  group: update-workflow
+  cancel-in-progress: false
+
 jobs:
   update:
     runs-on: ubuntu-latest
